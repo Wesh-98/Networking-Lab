@@ -1,0 +1,54 @@
+# Backup files
+*.bak
+*~
+*.swp
+*.tmp
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE files
+.vscode/
+.idea/
+*.iml
+
+# Packet Tracer temporary files
+*.pka
+*.pks
+*.pkt~
+
+# Personal notes (keep private)
+personal-notes/
+private/
+
+# Credentials (never commit!)
+*password*
+*secret*
+credentials.txt
+
+# Large binary files
+*.iso
+*.bin
+*.tar
+*.zip
+*.rar
+
+# Logs
+*.log
+debug.txt
+
+# Windows specific
+ehthumbs.db
+Desktop.ini
+
+# macOS specific
+.AppleDouble
+.LSOverride
+._*
+
+# Linux specific
+*~
+.directory
+.Trash-*
