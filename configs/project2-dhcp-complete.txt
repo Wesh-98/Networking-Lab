@@ -1,0 +1,280 @@
+# Project 2: DHCP Per VLAN - Complete Configuration
+
+## Router DHCP Configuration
+
+```
+! ========================================
+! DHCP EXCLUDED ADDRESSES
+! ========================================
+! Exclude gateway addresses from DHCP assignment
+
+Router(config)# ip dhcp excluded-address 192.168.10.1
+Router(config)# ip dhcp excluded-address 192.168.20.1
+Router(config)# ip dhcp excluded-address 192.168.99.1
+
+! ========================================
+! DHCP POOL: VLAN10 (Users)
+! ========================================
+! Domain: hometurf.local
+
+Router(config)# ip dhcp pool VLAN10
+Router(dhcp-config)# network 192.168.10.0 255.255.255.0
+Router(dhcp-config)# default-router 192.168.10.1
+Router(dhcp-config)# dns-server 8.8.8.8
+Router(dhcp-config)# domain-name hometurf.local
+Router(dhcp-config)# exit
+
+! ========================================
+! DHCP POOL: VLAN20 (Servers)
+! ========================================
+! Domain: backbone.local
+
+Router(config)# ip dhcp pool VLAN20
+Router(dhcp-config)# network 192.168.20.0 255.255.255.0
+Router(dhcp-config)# default-router 192.168.20.1
+Router(dhcp-config)# dns-server 8.8.8.8
+Router(dhcp-config)# domain-name backbone.local
+Router(dhcp-config)# exit
+
+! ========================================
+! DHCP POOL: VLAN99 (Management)
+! ========================================
+! Domain: gaffer.local
+
+Router(config)# ip dhcp pool VLAN99
+Router(dhcp-config)# network 192.168.99.0 255.255.255.0
+Router(dhcp-config)# default-router 192.168.99.1
+Router(dhcp-config)# dns-server 8.8.8.8
+Router(dhcp-config)# domain-name gaffer.local
+Router(dhcp-config)# exit
+
+! ========================================
+! SAVE CONFIGURATION
+! ========================================
+
+Router(config)# exit
+Router# write memory
+```
+
+---
+
+## Complete Running Configuration (DHCP Section)
+
+```
+ip dhcp excluded-address 192.168.10.1
+ip dhcp excluded-address 192.168.20.1
+ip dhcp excluded-address 192.168.99.1
+!
+ip dhcp pool VLAN10
+ network 192.168.10.0 255.255.255.0
+ default-router 192.168.10.1
+ dns-server 8.8.8.8
+ domain-name hometurf.local
+!
+ip dhcp pool VLAN20
+ network 192.168.20.0 255.255.255.0
+ default-router 192.168.20.1
+ dns-server 8.8.8.8
+ domain-name backbone.local
+!
+ip dhcp pool VLAN99
+ network 192.168.99.0 255.255.255.0
+ default-router 192.168.99.1
+ dns-server 8.8.8.8
+ domain-name gaffer.local
+```
+
+---
+
+## Verification Commands
+
+### View DHCP Pools
+```
+Router# show ip dhcp pool
+
+Pool VLAN10 :
+ Utilization mark (high/low)    : 100 / 0
+ Subnet size (first/next)       : 0 / 0
+ Total addresses                : 254
+ Leased addresses               : 0
+ Excluded addresses             : 1
+ Pending event                  : none
+
+Pool VLAN20 :
+ Utilization mark (high/low)    : 100 / 0
+ Subnet size (first/next)       : 0 / 0
+ Total addresses                : 254
+ Leased addresses               : 0
+ Excluded addresses             : 1
+ Pending event                  : none
+
+Pool VLAN99 :
+ Utilization mark (high/low)    : 100 / 0
+ Subnet size (first/next)       : 0 / 0
+ Total addresses                : 254
+ Leased addresses               : 0
+ Excluded addresses             : 1
+ Pending event                  : none
+```
+
+### View DHCP Bindings
+```
+Router# show ip dhcp binding
+
+IP address       Client-ID/Hardware address    Lease expiration    Type
+192.168.10.2     0100.5056.xxxx.xx            Jan 31 2026         Automatic
+192.168.20.2     0100.5056.xxxx.xx            Jan 31 2026         Automatic
+```
+
+### View Excluded Addresses
+```
+Router# show running-config | include excluded
+
+ip dhcp excluded-address 192.168.10.1
+ip dhcp excluded-address 192.168.20.1
+ip dhcp excluded-address 192.168.99.1
+```
+
+### View Complete DHCP Configuration
+```
+Router# show running-config | section dhcp
+```
+
+---
+
+## PC Configuration
+
+### PC1 (VLAN 10 - Users)
+- **Configuration Method:** DHCP
+- **Expected IP:** 192.168.10.2 or higher
+- **Subnet Mask:** 255.255.255.0
+- **Default Gateway:** 192.168.10.1
+- **DNS Server:** 8.8.8.8
+- **Domain Name:** hometurf.local
+
+### PC2 (VLAN 20 - Servers)
+- **Configuration Method:** DHCP
+- **Expected IP:** 192.168.20.2 or higher
+- **Subnet Mask:** 255.255.255.0
+- **Default Gateway:** 192.168.20.1
+- **DNS Server:** 8.8.8.8
+- **Domain Name:** backbone.local
+
+---
+
+## DHCP Pool Summary
+
+| VLAN | Pool Name | Network | Gateway | DNS | Domain Name | Purpose |
+|------|-----------|---------|---------|-----|-------------|---------|
+| 10 | VLAN10 | 192.168.10.0/24 | 192.168.10.1 | 8.8.8.8 | hometurf.local | End users |
+| 20 | VLAN20 | 192.168.20.0/24 | 192.168.20.1 | 8.8.8.8 | backbone.local | Servers |
+| 99 | VLAN99 | 192.168.99.0/24 | 192.168.99.1 | 8.8.8.8 | gaffer.local | Management |
+
+---
+
+## Domain Name Meanings
+
+### **hometurf.local** (VLAN 10 - Users)
+- **Meaning:** Home territory, main user network
+- **Reference:** Represents the primary user workspace
+- **Soccer Reference:** The home stadium where the team plays ⚽
+
+### **backbone.local** (VLAN 20 - Servers)
+- **Meaning:** The structural support of the network
+- **Reference:** Critical infrastructure that supports all services
+- **Technical:** The "backbone" carries the heavy load
+
+### **gaffer.local** (VLAN 99 - Management)
+- **Meaning:** The boss, the person in charge
+- **Reference:** British slang for manager/supervisor
+- **Soccer Reference:** The team manager/head coach who runs the show ⚽
+
+---
+
+## 📝 Side Note: Soccer Theme
+
+The domain naming scheme follows a **soccer/football theme**:
+
+- **hometurf.local** → The pitch/home stadium (where users/players operate)
+- **backbone.local** → The team's core strength (midfield/infrastructure)
+- **gaffer.local** → The manager (commands and controls everything)
+
+This creative naming:
+- ✅ Makes the network memorable
+- ✅ Shows personality and creativity
+- ✅ Maintains professional functionality
+- ✅ Reflects passion for the sport
+- ✅ Creates a cohesive network identity
+
+**Alternative soccer-themed names considered:**
+- `pitch.local` - The playing field
+- `striker.local` - Attack/front-end servers
+- `midfield.local` - Core services
+- `keeper.local` - Security/firewall zone
+- `stands.local` - Guest/visitor network
+
+The chosen names work perfectly for a lab environment while maintaining that soccer spirit! ⚽🥅
+
+---
+
+## Testing & Validation
+
+### Test Connectivity
+```
+PC1> ipconfig
+PC1> ping 192.168.10.1    (Gateway)
+PC1> ping 192.168.20.2    (PC2)
+PC1> ping 192.168.99.1    (Management gateway)
+```
+
+### Expected Results
+✅ PC1 receives IP from 192.168.10.x range  
+✅ PC2 receives IP from 192.168.20.x range  
+✅ Both PCs have correct gateway and DNS  
+✅ Inter-VLAN communication works  
+✅ DHCP bindings show on router  
+✅ No IP conflicts  
+
+---
+
+## Troubleshooting
+
+### PC Not Getting IP
+```
+Router# show ip dhcp pool
+Router# show ip dhcp binding
+Router# show ip dhcp server statistics
+Router# show running-config | include service dhcp
+```
+
+If DHCP service is disabled:
+```
+Router(config)# service dhcp
+```
+
+### Clear DHCP Bindings
+```
+Router# clear ip dhcp binding *
+```
+
+### Clear Conflicts
+```
+Router# show ip dhcp conflict
+Router# clear ip dhcp conflict *
+```
+
+---
+
+## Resume Bullets for This Project
+
+- Configured DHCP services on Cisco router for three VLANs with automatic IP assignment
+- Implemented IP address exclusion to prevent conflicts with static infrastructure devices
+- Designed custom domain naming scheme (hometurf.local, backbone.local, gaffer.local)
+- Verified DHCP lease assignment and tested inter-VLAN connectivity
+- Documented complete DHCP configuration for network operations reference
+
+---
+
+*Configuration completed: January 2026*  
+*Domain theme: Soccer/Football inspired* ⚽  
+*Status: Project 2 Complete ✅*
