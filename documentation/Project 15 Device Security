@@ -97,12 +97,12 @@ Purpose:
 
 4. Verification & Testing
    
-  - Test	Result
-  - SSH login	Successful
-  - Telnet attempt	Blocked
-  - ACL restriction	Only Management VLAN permitted
-  - Banner display	Confirmed
-  - Session timeout	Enforced
+    Test ->	Result
+  - SSH -> login	Successful
+  - Telnet -> attempt	Blocked
+  - ACL restriction ->	Only Management VLAN permitted
+  - Banner display ->	Confirmed
+  - Session timeout	-> Enforced
 
 5. Key Concepts Learned
 
