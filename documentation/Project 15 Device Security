@@ -1,0 +1,125 @@
+PROJECT 15 – CISCO DEVICE SECURITY & SSH HARDENING
+
+1. Objective
+
+  - Harden a Cisco router by implementing secure local authentication, encrypted remote access using SSH v2, access control restrictions for management traffic, and session 
+  security policies.
+
+2. Security Risks Identified
+
+Before hardening, the router had the following risks:
+
+  - Telnet allowed (plaintext authentication)
+
+  - Weak privileged mode protection
+
+  - No enforced session timeout
+
+  - No login warning banner
+
+  - No restriction on management access source networks
+
+3. Implementation
+   
+3.1 Secure Privileged EXEC Mode
+  no enable password
+  enable secret StrongPassword123
+  service password-encryption
+
+Explanation:
+  - enable secret stores a hashed password and overrides enable password.
+
+3.2 Create Local Administrative Users
+  username gaffer1 secret gaffer123
+  username gaffer privilege 15 secret gafferAdmin123
+
+  Privilege 1 → Basic user access
+  Privilege 15 → Full administrative control
+
+  - This enables local AAA authentication for console and VTY access.
+
+3.3 Configure SSH Version 2
+
+Requirements:
+  - Hostname
+  - Domain name
+  - RSA key pair
+
+  hostname Router0
+  ip domain-name lab.local
+  crypto key generate rsa
+  ip ssh version 2
+
+Verification:
+  show ip ssh
+
+  Expected output:
+  SSH Enabled - version 2.0
+
+Telnet was disabled by configuring:
+  line vty 0 4
+  transport input ssh
+   
+3.4 Restrict Management Access with ACL
+
+Only the Management VLAN (192.168.99.0/24) is allowed SSH access.
+  access-list 10 permit 192.168.99.0 0.0.0.255
+
+Applied to VTY lines:
+  line vty 0 4
+   login local
+   transport input ssh
+   access-class 10 in
+   exec-timeout 15
+
+This enforces:
+  - Encrypted remote access
+  - Source IP filtering
+  - Automatic session timeout (15 minutes)
+
+3.5 Secure Console Access
+
+  line console 0
+   login local
+   exec-timeout 15
+
+  - Prevents unattended console sessions from remaining open.
+
+3.6 Configure Login Banner
+
+  banner motd !
+  ***** Authorized Access Only. All Activity Monitored. ***** !
+
+Purpose:
+  - Legal notification
+  - Compliance best practice
+  - Warning before authentication
+
+4. Verification & Testing
+   
+  - Test	Result
+  - SSH login	Successful
+  - Telnet attempt	Blocked
+  - ACL restriction	Only Management VLAN permitted
+  - Banner display	Confirmed
+  - Session timeout	Enforced
+
+5. Key Concepts Learned
+
+  - Secure remote device management
+  - Local AAA authentication
+  - SSH key generation and encryption
+  - Access control via standard ACL
+  - Session hardening
+  - Enterprise device security practices
+
+6. Real-World Relevance
+
+This configuration reflects real-world enterprise security policies where:
+  - Telnet is disabled
+  - SSH v2 is mandatory
+  - Access is restricted to management VLANs
+  - Privileged access is role-based
+  - Session timeouts are enforced
+
+
